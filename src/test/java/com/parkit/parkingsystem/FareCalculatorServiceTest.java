@@ -24,7 +24,7 @@ class FareCalculatorServiceTest {
     }
 
     @BeforeEach
-    private void setUpPerTest() {
+    public void setUpPerTest() {
         ticket = new Ticket();
     }
 
