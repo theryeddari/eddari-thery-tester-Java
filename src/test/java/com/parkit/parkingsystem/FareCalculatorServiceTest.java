@@ -82,6 +82,19 @@ class FareCalculatorServiceTest {
         assertThrows(IllegalArgumentException.class, () -> fareCalculatorService.calculateFare(ticket));
     }
     @Test
+    void calculateFareBikeWithDiscount(){
+        Date inTime = new Date();
+        inTime.setTime( System.currentTimeMillis() - ( 30 * 60 * 1000 ) );
+        Date outTime = new Date();
+        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE,false);
+
+        ticket.setInTime(inTime);
+        ticket.setOutTime(outTime);
+        ticket.setParkingSpot(parkingSpot);
+        fareCalculatorService.calculateFare(ticket, true);
+        assertEquals( (0.95 * 0.5 * Fare.BIKE_RATE_PER_HOUR ), ticket.getPrice() );
+    }
+    @Test
     void calculateFareBikeWithLessThan30minutesParkingTime(){
         Date inTime = new Date();
         inTime.setTime( System.currentTimeMillis() - (  (30 * 60 * 1000) - 1) );
