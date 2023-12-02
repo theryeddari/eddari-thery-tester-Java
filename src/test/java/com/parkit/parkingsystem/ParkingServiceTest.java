@@ -69,4 +69,12 @@ class ParkingServiceTest {
         verify(ticketDAO, Mockito.times(1)).getNbTicket(anyString());
         verify(ticketDAO, Mockito.times(1)).saveTicket(any(Ticket.class));
     }
+    @Test
+    void processExitingVehicleTestUnableUpdate(){
+        when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
+        when(ticketDAO.getTicket("ABCDEF")).thenReturn(ticket);
+        when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(false);
+        parkingService.processExitingVehicle();
+        verify(parkingSpotDAO, Mockito.times(0)).updateParking(any(ParkingSpot.class));
+    }
 }
