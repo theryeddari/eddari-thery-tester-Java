@@ -34,6 +34,9 @@ public class ParkingService {
                 String vehicleRegNumber = getVehichleRegNumber();
                 parkingSpot.setAvailable(false);
                 parkingSpotDAO.updateParking(parkingSpot);//allot this parking space and mark it's availability as false
+                if(ticketDAO.getNbTicket(vehicleRegNumber)){
+                    System.out.println("Heureux de vous revoir ! En tant qu’utilisateur régulier de \n notre parking, vous allez obtenir une remise de 5%");
+                }
 
                 Date inTime = new Date();
                 Ticket ticket = new Ticket();
