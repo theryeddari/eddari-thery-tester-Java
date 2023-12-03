@@ -100,7 +100,6 @@ public class ParkingDataBaseIT {
         double gapTimeDecimal = (double) (checkTicket.getOutTime().getTime() - checkTicket.getInTime().getTime()) / (60 * 60 * 1000);
         double priceExpected = gapTimeDecimal * Fare.CAR_RATE_PER_HOUR * 0.95;
         assertEquals(priceExpected,checkTicket.getPrice(),0.1);
-        //TODO : test ok but not functional (mySQL rewrite last old timeOut ticket)
         //TODO : refactor ParkingDataBaseIT
     }
 }
