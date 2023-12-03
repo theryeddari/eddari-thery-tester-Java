@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Date;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -82,5 +83,24 @@ public class ParkingDataBaseIT {
         double priceExpected = gapTimeDecimal * Fare.CAR_RATE_PER_HOUR;
         assertEquals(priceExpected,checkTicket.getPrice(),0.1);
     }
+    @Test
+    void testParkingLotExitRecurringUser() {
+        ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+        parkingService.processIncomingVehicle();
+        await().pollDelay(5, SECONDS).until(() -> true);
+        parkingService.processExitingVehicle();
+        parkingService.processIncomingVehicle();
+        await().pollDelay(5, SECONDS).until(() -> true);
+        parkingService.processExitingVehicle();
 
+        Ticket checkTicket = ticketDAO.getTicket("ABCDEF");
+
+        assertTrue(ticketDAO.getNbTicket("ABCDEF"));
+        assertNotNull(checkTicket.getOutTime());
+        double gapTimeDecimal = (double) (checkTicket.getOutTime().getTime() - checkTicket.getInTime().getTime()) / (60 * 60 * 1000);
+        double priceExpected = gapTimeDecimal * Fare.CAR_RATE_PER_HOUR * 0.95;
+        assertEquals(priceExpected,checkTicket.getPrice(),0.1);
+        //TODO : test ok but not functional (mySQL rewrite last old timeOut ticket)
+        //TODO : refactor ParkingDataBaseIT
+    }
 }
