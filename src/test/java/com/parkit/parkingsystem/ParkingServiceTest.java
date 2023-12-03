@@ -93,4 +93,10 @@ class ParkingServiceTest {
         ParkingSpot testReturnParkingSpot = parkingService.getNextParkingNumberIfAvailable();
         assertNull(testReturnParkingSpot);
     }
+    @Test
+    void testGetNextParkingNumberIfAvailableParkingNumberWrongArgument(){
+        when(inputReaderUtil.readSelection()).thenReturn(3);
+        ParkingSpot testReturnParkingSpot = parkingService.getNextParkingNumberIfAvailable();
+        assertNull(testReturnParkingSpot);
+    }
 }
