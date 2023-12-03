@@ -1,5 +1,6 @@
 package com.parkit.parkingsystem.integration;
 
+import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
 import com.parkit.parkingsystem.integration.config.DataBaseTestConfig;
@@ -7,6 +8,7 @@ import com.parkit.parkingsystem.integration.service.DataBasePrepareService;
 import com.parkit.parkingsystem.model.Ticket;
 import com.parkit.parkingsystem.service.ParkingService;
 import com.parkit.parkingsystem.util.InputReaderUtil;
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,8 +17,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import java.util.Date;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -62,10 +67,20 @@ public class ParkingDataBaseIT {
 
     @Test
     void testParkingLotExit(){
-        testParkingACar();
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+        parkingService.processIncomingVehicle();
+        Awaitility.await().pollDelay(1, SECONDS).until(() -> true);
         parkingService.processExitingVehicle();
-        //TODO: check that the fare generated and out time are populated correctly in the database
+
+        Ticket checkTicket = ticketDAO.getTicket("ABCDEF");
+
+        assertNotNull(checkTicket.getOutTime());
+        long timeOut = checkTicket.getOutTime().getTime();
+        long nowTime = new Date().getTime();
+        assertEquals(nowTime, timeOut,(1000)); // 1 secondes de délai max connexion a la base etc.
+        double gapTimeDecimal = (double) (checkTicket.getOutTime().getTime() - checkTicket.getInTime().getTime()) / (60 * 60 * 1000);
+        double priceExpected = gapTimeDecimal * Fare.CAR_RATE_PER_HOUR;
+        assertEquals(priceExpected,checkTicket.getPrice(),0.1);
     }
 
 }
