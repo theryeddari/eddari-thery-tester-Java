@@ -80,12 +80,11 @@ public class TicketDAO {
              PreparedStatement ps = con.prepareStatement(DBConstants.REGULAR_CLIENT)) {
             ps.setString(1, vehicleRegNumber);
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getBoolean(1);
-            }
+           rs.next();
+           return rs.getBoolean(1);
         } catch (Exception ex) {
             logger.error("Error fetching reg number", ex);
+            return false;
         }
-        return false;
     }
 }
